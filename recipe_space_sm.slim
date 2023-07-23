@@ -7,13 +7,11 @@ initialize() {
 	//sigma=0.2;
 	//s=-0.00001;
 	//mu=1e-8; 
-	
-	
-	defineConstant("outpath","sims");
+	//K
 	
 	// defineConstant("id",format("%.0f",runif(1,1e6,1e7-1)));
 	
-	defineConstant("K", 5);  // carrying-capacity per unit square (roughly)
+	//defineConstant("K", 5);  // carrying-capacity per unit square (roughly)
 	defineConstant("SD", sigma);  // sigma_D, the dispersal distance
 	defineConstant("SI", sigma);  // sigma_I, the spatial interaction distance
 	defineConstant("SM", SI);  // sigma_M, the mate choice distance
@@ -86,14 +84,12 @@ early() {
 
 
 
-10000 late() { // modified time from 100000
+10000 late() {
 	
 	// Print the results
 	print(SD + " " + sim.generation);
 	
-	// Output tree sequence	
-	outname1=outpath+"/"+stamp+"/"+id+"_"+sim.generation+"_"+W+"_"+sigma+"_"+mu+"_"+s+".trees";
-	
-	sim.treeSeqOutput(outname1);
+	// Output tree sequence
+	sim.treeSeqOutput(outpath);
 	sim.simulationFinished();
 }

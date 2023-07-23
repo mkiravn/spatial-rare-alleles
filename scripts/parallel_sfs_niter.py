@@ -15,11 +15,14 @@ np.random.seed(1234)
 parser = argparse.ArgumentParser(description='Calculate and save SFS data.')
 parser.add_argument('input_file', help='File to be processed')
 parser.add_argument('--num_samples', type=int, default=100, help='Number of individuals to sample')
+parser.add_argument('--output', type=str, help='Output path')
+parser.add_argument('--niter', type=int, default=1000, help='Number of iterations for sampling')
 args = parser.parse_args()
-print(args)
 
 input_file = args.input_file
 num_to_sample = args.num_samples
+output = args.output
+output = args.niter
 niter=100
 
 # Create output directory for SFS files
@@ -75,11 +78,7 @@ sd_range = np.concatenate((np.arange(0, 2, 0.1), np.arange(5, 105, 5)))
 
 
 sfs_data = {}
-
 bin_edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50, 80, 100, 200, 500, 800, 1000]
-
-
-
 
 for sd_value in sd_range:
     # var_value = (sd_value * np.sqrt(0.06))**2 # re-scaling for sigma=0.2 and seff=sqrt(0.06)
@@ -99,8 +98,6 @@ for sd_value in sd_range:
             mut_arr = mut_afs
         else:
             mut_arr = np.vstack((mut_arr,mut_afs))
-            #print(np.shape(mut_arr))
-    #print(mut_arr)
     sfs_data[sd_value] = np.mean(mut_arr,axis=0)
     print(f"SFS for width {sd_value}: {sfs_data[sd_value]}, shape {np.shape(sfs_data[sd_value])}")
 
@@ -112,12 +109,11 @@ print(f"St. dev of x coordinates of all individuals: {np.std(locs[:, 0])}")
 
 # Create DataFrame from the SFS data
 sfs_data['allele counts'] = np.array(bin_edges[1:len(bin_edges)])
-print(np.shape(sfs_data['allele counts']))
 sfs_df = pd.DataFrame(sfs_data)
 
 # Save SFS DataFrame to file
 print("Saving file to")
-print(output_filename)
-sfs_df.to_csv(output_filename, sep='\t', index=False, na_rep="NA")
+print(output)
+sfs_df.to_csv(output, sep='\t', index=False, na_rep="NA")
 
 
