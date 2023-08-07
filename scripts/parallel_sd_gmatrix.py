@@ -15,14 +15,14 @@ np.random.seed(1234)
 parser = argparse.ArgumentParser(description='Calculate and save SFS data.')
 parser.add_argument('input_file', help='File to be processed')
 parser.add_argument('--num_samples', type=int, default=100, help='Number of individuals to sample')
+parser.add_argument('--output', help='Output file path')
 args = parser.parse_args()
 print(args)
 
 input_file = args.input_file
 num_to_sample = args.num_samples
+output = args.output
 print(num_to_sample)
-# Create output directory for SFS files
-output_dir = os.path.join(input_file, 'sfs',str(num_to_sample))
 
 num_bins = 50 # number of bins for bincount
 
@@ -34,7 +34,6 @@ base_filename = os.path.splitext(os.path.basename(input_file))[0]
 
 # Create the output filename with the "sds" directory included
 num_samples_str =str(num_to_sample)
-output_filename = os.path.join(file_dir, "sfs", base_filename + '_' + num_samples_str + '.sd.tsv')
 
 # Load tree sequence
 slim_ts = tskit.load(input_file)
@@ -97,8 +96,6 @@ sfs_data = {}
 
 bin_edges = np.geomspace(1,num_to_sample,num=num_bins)
 
-
-
 for sd_value, samples in samples_dict.items():
     empi_sd_x = np.std(locs[samples,0])
     print(f"Sampling sd: {sd_value} Sd of locations: {empi_sd_x}")
@@ -111,11 +108,11 @@ sfs_df = pd.DataFrame(sfs_data)
 
 # Save SFS DataFrame to file
 print("Saving file to")
-print(output_filename)
+print(output)
 
 sds = {"Sampling":sd_range,"Realised":sd_list}
 sds_df = pd.DataFrame(sds)
-sds_df.to_csv(output_filename, sep='\t', index=False,na_rep= "NA")
+sds_df.to_csv(output, sep='\t', index=False,na_rep= "NA")
 
 
 
