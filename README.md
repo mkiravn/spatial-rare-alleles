@@ -6,3 +6,7 @@ submit snakemake to clustsnakemake --cluster "sbatch -A pi-jnovembre -t 01:00:00
 
 and don't forget to modify jobs and memory within rule!
 
+or with profile snakemake --profile slurm/
+
+might need to make logs directory
+
