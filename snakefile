@@ -14,7 +14,7 @@ sigmas = [0.2]
 
 rule all:
     input:
-        expand("sfs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n1000_niter1000.sfs",
+        expand("sds/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n1000.sfs",
                rep=range(replicates),
                s=s_coeffs,
                mu=mus,
@@ -55,4 +55,18 @@ rule sample_sfs:
             --num_samples {wildcards.n} \
             --output {output} \
             --niter {wildcards.niter}
+        """
+
+# checking spatial positions
+rule sample_locations:
+    input:
+        "sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}.sds.log"
+    output:
+        "sds/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}.sds"
+    shell:
+        """
+        python scripts/parallel_sfs_niter.py {input} \
+            --num_samples {wildcards.n} \
+            --output {output}
         """
