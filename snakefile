@@ -14,7 +14,7 @@ sigmas = [0.2]
 
 rule all:
     input:
-        expand("sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees",
+        expand("sfs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n1000_niter1000.sfs",
                rep=range(replicates),
                s=s_coeffs,
                mu=mus,
@@ -46,16 +46,13 @@ rule run_simulations:
 rule sample_sfs:
     input:
         "sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
-    params:
-        n = 1000,
-        niter=1000
-    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.sfs.log"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}.sfs.log"
     output:
-        "sfs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.sfs"
+        "sfs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}.sfs"
     shell:
         """
         python scripts/parallel_sfs_niter.py {input} \
-            --num_samples {params.n} \
+            --num_samples {wildcards.n} \
             --output {output} \
-            --niter {params.niter}
+            --niter {wildcards.niter}
         """
