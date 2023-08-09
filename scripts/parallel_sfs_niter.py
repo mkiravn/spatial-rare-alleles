@@ -22,8 +22,8 @@ args = parser.parse_args()
 input_file = args.input_file
 num_to_sample = args.num_samples
 output = args.output
-output = args.niter
-niter=100
+niter = args.niter
+
 
 # Create output directory for SFS files
 output_dir = os.path.join(input_file, 'sfs', str(num_to_sample))
@@ -74,11 +74,16 @@ def get_weights(lcs, mean=25, var=5):
 
 
 # Gaussian samples with different sds
-sd_range = np.concatenate((np.arange(0, 2, 0.1), np.arange(5, 105, 5)))
-
+sd_range_disp = np.arange(0, 205, 5)
+sd_range = sd_range_disp * np.sqrt(0.06)
 
 sfs_data = {}
-bin_edges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50, 80, 100, 200, 500, 800, 1000]
+bin_edges = np.power(10, np.linspace(np.log10(1), np.log10(1000), num=10))
+bin_edges = np.concatenate(([0], bin_edges))
+integer_bin_edges = np.floor(bin_edges).astype(int)
+bin_widths = np.diff(integer_bin_edges)
+
+bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
 for sd_value in sd_range:
     # var_value = (sd_value * np.sqrt(0.06))**2 # re-scaling for sigma=0.2 and seff=sqrt(0.06)
@@ -93,7 +98,7 @@ for sd_value in sd_range:
         samples = list(samples.astype(int))
         freqs = np.sum(G[:, samples], 1)  # get frquencies by summing over individuals
         mut_afs, edg = np.histogram(freqs, bins=bin_edges)
-        mut_afs = mut_afs / np.diff(bin_edges)  # normalise by bin width
+        mut_afs = mut_afs / bin_widths  # normalise by bin width
         if i==0:
             mut_arr = mut_afs
         else:
@@ -108,12 +113,15 @@ print(f"Computed sfs for {input_file}")
 print(f"St. dev of x coordinates of all individuals: {np.std(locs[:, 0])}")
 
 # Create DataFrame from the SFS data
-sfs_data['allele counts'] = np.array(bin_edges[1:len(bin_edges)])
+sfs_data['allele counts'] = np.array(bin_centers)
+
 sfs_df = pd.DataFrame(sfs_data)
 
 # Save SFS DataFrame to file
 print("Saving file to")
 print(output)
 sfs_df.to_csv(output, sep='\t', index=False, na_rep="NA")
+
+
 
 
