@@ -78,12 +78,14 @@ sd_range_disp = np.arange(0, 205, 5)
 sd_range = sd_range_disp * np.sqrt(0.06)
 
 sfs_data = {}
-bin_edges = np.power(10, np.linspace(np.log10(1), np.log10(1000), num=10))
+s = np.linspace(np.log10(1), np.log10(1000), num=10)
+bin_edges = np.power(10, s)
 bin_edges = np.concatenate(([0], bin_edges))
 integer_bin_edges = np.floor(bin_edges).astype(int)
 bin_widths = np.diff(integer_bin_edges)
 
-bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+m = (s[:-1] + s[1:]) / 2
+bin_centers = np.power(10, m)
 
 for sd_value in sd_range:
     # var_value = (sd_value * np.sqrt(0.06))**2 # re-scaling for sigma=0.2 and seff=sqrt(0.06)
