@@ -14,7 +14,7 @@ sigmas = [0.2]
 
 rule all:
     input:
-        expand("sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees",
+        expand("sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees",
                rep=range(replicates),
                s=s_coeffs,
                mu=mus,
@@ -26,7 +26,7 @@ rule all:
 # Define the first step: run_simulations
 rule run_simulations:
     output:
-        "sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
+        "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
     log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees.log"
     params: s_val= lambda wildcards: str(wildcards.s) 
     resources: mem_mb=60000
@@ -45,10 +45,10 @@ rule run_simulations:
 # Second step: sfs sampling
 rule sample_sfs:
     input:
-        "sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
+        "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
     log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}.sfs.log"
     output:
-        "sfs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}.sfs"
+        "sfs/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}.sfs"
     shell:
         """
         python scripts/parallel_sfs_niter.py {input} \
@@ -60,10 +60,10 @@ rule sample_sfs:
 # checking spatial positions
 rule sample_locations:
     input:
-        "sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
+        "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
     log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}.sds.log"
     output:
-        "sds/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}.sds"
+        "sds/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}.sds"
     shell:
         """
         python scripts/parallel_sfs_niter.py {input} \
