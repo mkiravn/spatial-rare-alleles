@@ -60,13 +60,13 @@ def get_weights(lcs, mean=25, var=5):
 
 
 # Gaussian samples with different sds
-sd_range_disp = np.arange(5, 205, 5)
+sd_range_disp = np.arange(5, 205, 20)
 sd_range = sd_range_disp * np.sqrt(0.06)
 
 variant_data={}
 for sd_value in sd_range:
     print(f"Sampling sd {sd_value}.")
-    variant_freqs = np.zeros(shape = (1,np.shape(G)[0]))
+    variant_freqs = [0] * G.shape[0]
     for it in range(niter):
         var_value = sd_value ** 2 # get variance
         weights = get_weights(locs, 25, var_value) # get weights
@@ -75,7 +75,6 @@ for sd_value in sd_range:
         # get a vector of variant frequencies
         # and average over sampling iterations
         variant_freqs += (np.sum(G[:,samples],axis=1)/np.shape(G)[1])/niter
-
     variant_data[sd_value] = variant_freqs.tolist()
 
 print(f"St. dev of x coordinates of all individuals: {np.std(locs[:, 0])}")
