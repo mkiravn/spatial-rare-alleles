@@ -6,10 +6,10 @@ args <- commandArgs(trailingOnly=TRUE)
 inputdir <- args[1]
 # Directory path containing the files
 directory <- inputdir
-
+print(inputdir)
 # Get list of files in the directory
 
-file_names <- list.files(pattern = "*.sfs.tsv",path = input_dir)
+file_list <- list.files(pattern = "*.sfs.tsv",path = inputdir)
 print(paste(length(file_list),"files found."))
 # Initialize an empty list to store data frames
 dfs <- list()
@@ -20,7 +20,7 @@ for (file in file_list) {
   file_name <- basename(file)
   info <- strsplit(file_name, "_", fixed = TRUE)[[1]] %>% extract_numeric() 
   info <- info[is.na(info)==F]
-  
+  file <- paste0(inputdir,"/",file)
   # Read the file, skipping the first row (commented out line)
   data <- fread(file, skip = 1)
   
@@ -47,7 +47,7 @@ for (file in file_list) {
 df <- data.frame()
 
 # Loop over the file names
-for (file_name in file_names) {
+for (file_name in file_list) {
   # Extract the parameters from the file name
   params <- strsplit(file_name, "_")[[1]] %>% extract_numeric() 
   params <- params[is.na(params)==F]
@@ -62,7 +62,7 @@ for (file_name in file_names) {
   num_samples <- as.integer(sub("\\.sfs\\.tsv", "", params[7]))
   
   # Read the file into a data frame
-  file_path <- paste(input_dir, file_name,sep = "/")  # Replace with the actual file path
+  file_path <- paste(inputdir, file_name,sep = "/")  # Replace with the actual file path
   data <- read.table(file_path, skip = 1 , header= F,na.strings = "NA") 
   # filter on row sums
   header <- str_split(read_lines(file_path, skip = 0)[1],"\t")[[1]]
@@ -93,5 +93,5 @@ df_summary <- df %>%
 df_summary <- df_summary %>% 
   filter(`allele counts`>0,width>0) 
 
-df_summary %>% write_delim(delim="\t",file=file.path(inputdir,"summary_df.tsv"))
+df_summary %>% write_delim(delim="\t",file.path(inputdir,"summary_df.tsv"))
 

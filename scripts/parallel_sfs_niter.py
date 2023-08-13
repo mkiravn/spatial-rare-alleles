@@ -84,6 +84,7 @@ bin_edges = np.concatenate(([0], bin_edges))
 integer_bin_edges = np.floor(bin_edges).astype(int)
 bin_widths = np.diff(integer_bin_edges)
 
+s = np.concatenate(([0],s))
 m = (s[:-1] + s[1:]) / 2
 bin_centers = np.power(10, m)
 
