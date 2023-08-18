@@ -1,12 +1,15 @@
 # spatial-rare-alleles
 
-Welcome to the project! Simulations and sfs sampling run via snakemake pipeline 
+Welcome to the project! 
 
-submit snakemake to clustsnakemake --cluster "sbatch -A pi-jnovembre -t 01:00:00 -p jnovembre --mem=20000" --jobs 1
+Here's what you do:
 
-and don't forget to modify jobs and memory within rule!
+You can run simulations by executing snakemake from the command line
 
-or with profile snakemake --profile slurm/
+`snakemake --cluster "sbatch -A pi-jnovembre -t 24:00:00 -p bigmem2 --mem=40000" --jobs 10`
 
-might need to make logs directory
+Some of the larger simulations require running on bigmem2. The memory requirement for the simulation rule can be specified within it. Each simulation will end up in a folder in the `sims` directory with the name as the parameter combination.
 
+After that, there are a couple more steps:
+* Sample the SFS for each simulation run. You can do this in snakemake, or (as I've been doing more commonly) from the command line with `write_sfs_parallel.sh`. I've been running with 1000 samples and 100 iterations, but this can be changed within the script
+* Now you need to compute the SFS into one file. You can do this with the command `Rscript scripts/compile.R inputdir` where `inputdir` is your directory of choice. This will create an output called `summary.df` with the compiled data.
