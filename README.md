@@ -2,8 +2,6 @@
 
 Welcome to the project! 
 
-Here's what you do:
-
 You can run simulations by executing snakemake from the command line
 
 `snakemake --cluster "sbatch -A pi-jnovembre -t 24:00:00 -p bigmem2 --mem=40000" --jobs 10`
