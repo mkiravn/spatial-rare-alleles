@@ -78,18 +78,24 @@ sd_range_disp = np.arange(0, 205, 5)
 sd_range = sd_range_disp * np.sqrt(0.06)
 
 sfs_data = {}
-s = np.linspace(np.log10(1), np.log10(1000), num=10)
-bin_edges = np.power(10, s)
-bin_edges = np.concatenate(([0], bin_edges))
-integer_bin_edges = np.floor(bin_edges).astype(int)
-bin_widths = np.diff(integer_bin_edges)
 
-s = np.concatenate(([0],s))
-m = (s[:-1] + s[1:]) / 2
-bin_centers = np.power(10, m)
+# Create an array 's' containing 25 equally spaced values in log space
+s = np.linspace(np.log10(1), np.log10(1000), num=25)
+
+# Compute 'bin_edges' and add a zero at the beginning
+bin_edges = np.concatenate(([0], np.power(10, s)))
+
+# Calculate 'integer_bin_edges' and 'bin_widths'
+integer_bin_edges = np.floor(bin_edges).astype(int)
+bin_widths = np.where(np.diff(integer_bin_edges) == 0, 1, np.diff(integer_bin_edges))
+
+# Add a zero at the beginning of array 's'
+s = np.concatenate(([0], s))
+
+# Calculate 'bin_centers'
+bin_centers = np.power(10, (s[:-1] + s[1:]) / 2)
 
 for sd_value in sd_range:
-    # var_value = (sd_value * np.sqrt(0.06))**2 # re-scaling for sigma=0.2 and seff=sqrt(0.06)
     var_value = sd_value ** 2
     if var_value == 0:
         weights = np.ones(len(locs[:, 0])) / len(locs[:, 0])  # Uniform weights for random sample
