@@ -22,7 +22,6 @@ rule all:
                W=Ws,
                sigma=sigmas)
 
-
 # Define the first step: run_simulations
 rule run_simulations:
     output:
@@ -57,6 +56,22 @@ rule sample_sfs:
             --niter {wildcards.niter}
         """
 
+# Variant sampling
+rule sample_variants:
+    input:
+        "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}.variants.log"
+    output:
+        "sfs/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}.variants"
+    shell:
+        """
+        python scripts/parallel_sfs_maggie.py {input} \
+            --num_samples {wildcards.n} \
+            --output {output} \
+            --niter {wildcards.niter}
+        """
+
+
 # checking spatial positions
 rule sample_locations:
     input:
@@ -69,4 +84,50 @@ rule sample_locations:
         python scripts/parallel_sfs_niter.py {input} \
             --num_samples {wildcards.n} \
             --output {output}
+        """
+
+# cut and recapitate trees
+rule cut_recapitate:
+    input:
+        "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_recapitated_N{past_Ne}_t{time_bottle}.trees.log"
+    output:
+        "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.trees"
+    shell:
+        """
+        python scripts/cut_recapitate_snakemake.py {input} \
+            --past_Ne {wildcards.past_Ne} \
+            --time_bottle {wildcards.time_bottle} \
+            --output {output}
+        """
+
+# Second step: sfs sampling
+rule sample_sfs_recapitated:
+    input:
+        "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_recapitated_N{past_Ne}_t{time_bottle}.sfs.log"
+    output:
+        "sfs/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.sfs"
+    shell:
+        """
+        python scripts/parallel_sfs_niter.py {input} \
+            --num_samples {wildcards.n} \
+            --output {output} \
+            --niter {wildcards.niter}
+        """
+
+
+# Variant sampling
+rule sample_variants_recapitated:
+    input:
+        "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_recapitated_N{past_Ne}_t{time_bottle}.variants.log"
+    output:
+        "sfs/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.variants"
+    shell:
+        """
+        python scripts/parallel_sfs_maggie.py {input} \
+            --num_samples {wildcards.n} \
+            --output {output} \
+            --niter {wildcards.niter}
         """
