@@ -4,7 +4,7 @@
 ### to obtain an SFS
 
 
-replicates = 10 # number of simulation replicates
+replicates = 2 # number of simulation replicates
 s_coeffs = [-1e-3, -1e-2, -1e-1]
 s_coeffs_slim =  [s*2 for s in s_coeffs] # selection coefficients for slim
 mus = [1e-10] # mutation rates
@@ -14,13 +14,14 @@ sigmas = [0.2]
 
 rule all:
     input:
-        expand("sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees",
+        expand("sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.trees",
                rep=range(replicates),
                s=s_coeffs,
                mu=mus,
                K=Ks,
                W=Ws,
-               sigma=sigmas)
+               sigma=sigmas,
+		past_Ne=1000,time_bottle=2000)
 
 # Define the first step: run_simulations
 rule run_simulations:
@@ -90,7 +91,7 @@ rule sample_locations:
 rule cut_recapitate:
     input:
         "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
-    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_recapitated_N{past_Ne}_t{time_bottle}.trees.log"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.trees.log"
     output:
         "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.trees"
     shell:
@@ -105,9 +106,9 @@ rule cut_recapitate:
 rule sample_sfs_recapitated:
     input:
         "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
-    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_recapitated_N{past_Ne}_t{time_bottle}.sfs.log"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}_recapitated_N{past_Ne}_t{time_bottle}.sfs.log"
     output:
-        "sfs/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.sfs"
+        "sfs/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}_n{n}_niter{niter}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.sfs"
     shell:
         """
         python scripts/parallel_sfs_niter.py {input} \
@@ -121,9 +122,9 @@ rule sample_sfs_recapitated:
 rule sample_variants_recapitated:
     input:
         "sims/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees"
-    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_recapitated_N{past_Ne}_t{time_bottle}.variants.log"
+    log: "logs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_n{n}_niter{niter}_recapitated_N{past_Ne}_t{time_bottle}.variants.log"
     output:
-        "sfs/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.variants"
+        "sfs/W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_N{past_Ne}_t{time_bottle}_n{n}_niter{niter}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}.variants"
     shell:
         """
         python scripts/parallel_sfs_maggie.py {input} \
