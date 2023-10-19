@@ -15,18 +15,21 @@ gen_time = 5.6 # from simulations
 parser = argparse.ArgumentParser(description='Cut, recapitate and mutate trees.')
 parser.add_argument('input_file', help='File to be processed')
 parser.add_argument('--past_Ne', type=int, default=100, help='Effective population size in past (in coalescent time units)')
-parser.add_argument('--output', type=str, help='Output path')
+parser.add_argument('--output_dir', type=str, help='Output path')
 parser.add_argument('--time_bottle', type=int, default=1000, help='Number of generations in past at which population size reduced')
 args = parser.parse_args()
 
 input_file = args.input_file
 past_Ne = args.past_Ne
-output = args.output
+output_dir = args.output_dir
 time_bottle = args.time_bottle
 
 # Get the directory and base filename from the input file path
 file_dir = os.path.dirname(input_file)
 base_filename = os.path.splitext(os.path.basename(input_file))[0]
+
+# Ensure output directory exists
+os.makedirs(output_dir, exist_ok=True)
 
 # Load tree sequence
 slim_ts = tskit.load(input_file)
@@ -42,7 +45,7 @@ slim_ts = tables.tree_sequence()
 new_ts = slim_ts.decapitate(2000 * gen_time)
 
 # specify ancestry:
-N_past = 2000
+N_past = past_Ne
 
 # construct demography
 demography = msprime.Demography.from_tree_sequence(slim_ts,
@@ -57,7 +60,7 @@ for pop in demography.populations:
     i+=1
 
 # Population size change from 2000 generations ago to the beginning of the simulation
-demography.add_population_parameters_change(time = 2000 * gen_time, # in past. Scaling needed im order to match SLiM time
+demography.add_population_parameters_change(time = time_bottle * gen_time, # in past. Scaling needed im order to match SLiM time
                                             initial_size= N_past * gen_time, #
                                             population="pop_1")
 
@@ -74,7 +77,7 @@ new_ts = msprime.sim_mutations(new_ts,
                        random_seed=7)
 
 # Specify the file path where you want to save the trees
-output_file = os.path.join(file_dir, f"{base_filename}_recapitated_N{past_Ne}_t{time_bottle}.trees")
+output_file = os.path.join(output_dir, f"{base_filename}_recapitated_N{past_Ne}_t{time_bottle}.trees")
 
 # Write out the trees to the specified file
 new_ts.dump(output_file)

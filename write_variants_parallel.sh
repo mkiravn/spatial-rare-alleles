@@ -19,11 +19,23 @@ module load python/cpython-3.8.5
 
 
 # Add lines here to run your Python script on each task
-file_dir="sims"
+# file_dir="sims/W75_N2000_t2000"
+# file_list=($file_dir/*.trees)
+# filename=${file_list[$SLURM_ARRAY_TASK_ID-1]}
+# output_dir="sfs/sfs_W75_N2000_t2000_1210/"
+# output_file="${filename}_n1000_niter100.variants.tsv"
+
+# Add lines here to run your Python script on each task
+file_dir="sims/W75_N2000_t2000"
 file_list=($file_dir/*.trees)
 filename=${file_list[$SLURM_ARRAY_TASK_ID-1]}
-output_dir="sfs_new/"
-output_file="${filename}_n1000_niter100.variants.tsv"
+filename_nodir=$(basename "$filename")
+filename_noex="${filename_nodir%.trees}"
+output_dir="sfs/sfs_W75_N2000_t2000_1210/"
+output_file="${filename_noex}_n1000_niter100.variants.tsv"
+
+
+
 
 # Function to run a single simulation
 run_analysis() {

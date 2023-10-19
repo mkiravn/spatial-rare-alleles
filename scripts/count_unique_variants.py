@@ -85,8 +85,10 @@ for sd_value in sd_range:
         num_resampled =  len(samples) - len(unique_samples)
         ave_resampled += num_resampled/niter
         # sd of x location
-        realised_sd = empi_sd_x = np.std(locs[samples, 0])
+        realised_sd = np.std(locs[samples, 0])
         ave_sd += realised_sd / niter
+    print(resampled)
+    print(widths)
     resampled.append(ave_resampled)
     widths.append(ave_sd)
 

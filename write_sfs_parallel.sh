@@ -3,13 +3,13 @@
 #SBATCH --job-name=space_sfs
 #SBATCH --output=logs/space_sfs_%A_%a.out
 #SBATCH --error=logs/space_sfs_%A_%a.err
-#SBATCH --array=0-20%3
-#SBATCH --time=00:10:00
+#SBATCH --array=0-60%5
+#SBATCH --time=00:30:00
 #SBATCH --partition=broadwl
 #SBATCH --account=pi-jnovembre
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1  # Use 1 CPU core per task
-#SBATCH --mem=2G
+#SBATCH --mem=6G
 
 conda activate
 module unload python
@@ -19,12 +19,12 @@ module load python/cpython-3.8.5
 
 
 # Add lines here to run your Python script on each task
-file_dir="sims/W50*"
+file_dir="sims/W75_N2000_t2000"
 file_list=($file_dir/*.trees)
 filename=${file_list[$SLURM_ARRAY_TASK_ID-1]}
 filename_nodir=$(basename "$filename")
 filename_noex="${filename_nodir%.trees}"
-output_dir="sfs_2008/"
+output_dir="sfs/sfs_W75_N2000_t2000_1210/"
 output_file="${filename_noex}_n1000_niter100.sfs.tsv"
 
 # Function to run a single simulation

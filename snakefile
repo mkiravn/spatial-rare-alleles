@@ -4,12 +4,12 @@
 ### to obtain an SFS
 
 
-replicates = 5 # number of simulation replicates
+replicates = 10 # number of simulation replicates
 s_coeffs = [-1e-3, -1e-2, -1e-1]
 s_coeffs_slim =  [s*2 for s in s_coeffs] # selection coefficients for slim
 mus = [1e-10] # mutation rates
-Ks = [10] # densities
-Ws = [50]
+Ks = [5] # densities
+Ws = [75]
 sigmas = [0.2]
 
 rule all:
