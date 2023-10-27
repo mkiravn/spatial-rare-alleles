@@ -1,0 +1,9 @@
+# cluster_config.yml - cluster configuration
+__default__:
+    account: pi-jnovembre
+    partition: jnovembre
+    time: 01:00:00 # time limit for each job
+    nodes: 1
+    ntasks-per-node: 14 #Request n cores be allocated per node.
+    output: spatial-rare-alleles-%j.out
+    error: spatial-rare-alleles-%j.err
