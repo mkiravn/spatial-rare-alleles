@@ -12,15 +12,17 @@ Ks = [5] # densities
 Ws = [75]
 sigmas = [0.2]
 
+localrules: all
+
 rule all:
     input:
-        expand("sfs/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}_n{n}_niter{niter}.sfs",
-               rep=range(replicates),
-               s=s_coeffs,
+        expand("{filetype}/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}_recapitated_N{past_Ne}_t{time_bottle}_n{n}_niter{niter}.{filetype}",
+               rep=[0, 1, 5, 7, 9, 10, 19, 28, 33, 37, 38, 42, 47, 52, 56, 65, 70, 75, 76, 79, 80, 84, 89, 93, 98][:5],
+               s=-1e-2,
                mu=mus,
                K=Ks,
                W=Ws,
-               sigma=sigmas, n= 10, niter = 10,past_Ne=100,time_bottle=1000)
+               sigma=sigmas, n= 10000, niter = 100,past_Ne=[500,2000,5000],time_bottle=[500,2000,5000],filetype=["sfs","variants"])
 
 # Define the first step: run_simulations
 rule run_simulations:
@@ -28,7 +30,7 @@ rule run_simulations:
         "sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma,[0-9]+(\.[0-9]+)?}.trees"
     log: "logs/sims/{rep}_W{W}_s{s}_mu{mu}_K{K}_sigma{sigma}.trees.log"
     params: s_val= lambda wildcards: str(wildcards.s) 
-    resources: partition="broadwl",mem_mb=60000
+    resources: slurm_partition="broadwl",mem_mb=60000
     shell:
         """
         module load SLiM/3.0
@@ -49,7 +51,7 @@ rule sample_sfs:
     output:
         "sfs/{file}_n{n}_niter{niter}.sfs"
     resources:
-        partition="broadwl",mem_mb=5000,time_min=45
+        slurm_partition="broadwl",mem_mb=5000,time_min=45
     shell:
         """
         python scripts/parallel_sfs_niter.py {input} \
@@ -66,7 +68,7 @@ rule sample_variants:
     output:
         "variants/{file}_n{n}_niter{niter}.variants"
     resources:
-        partition="jnovembre"
+        slurm_partition="jnovembre"
     shell:
         """
         python scripts/parallel_sfs_maggie.py {input} \
@@ -83,7 +85,7 @@ rule cut_recapitate:
     output:
         "sims/{file}_recapitated_N{past_Ne}_t{time_bottle}.trees"
     resources:
-        partition="jnovembre"
+        slurm_partition="jnovembre"
     shell:
         """
         python scripts/cut_recapitate_snakemake.py {input} \

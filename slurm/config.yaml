@@ -1,11 +1,2 @@
-cluster: "sbatch --time={resources.time_min} 
-          --mem={resources.mem_mb}
-          -c {resources.cpus} 
-          -o slurm/logs/{rule}_{wildcards}
-          -e slurm/logs/{rule}_{wildcards} 
-          --partition={resources.partition}
-          --account=pi-jnovembre
-          --keep-going --rerun-incomplete --printshellcmds"
-jobs: 25
-default-resources: [cpus=1, mem_mb=1000, time_min=5]
-resources: [cpus=100, mem_mb=100000,partition=jnovembre]
+cluster: "sbatch --time=01:00:00 --partition=jnovembre --account=pi-jnovembre"
+jobs: 20
