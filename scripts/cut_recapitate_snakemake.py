@@ -15,21 +15,18 @@ gen_time = 5.6 # from simulations
 parser = argparse.ArgumentParser(description='Cut, recapitate and mutate trees.')
 parser.add_argument('input_file', help='File to be processed')
 parser.add_argument('--past_Ne', type=int, default=100, help='Effective population size in past (in coalescent time units)')
-parser.add_argument('--output_dir', type=str, help='Output path')
+parser.add_argument('--output', type=str, help='Output')
 parser.add_argument('--time_bottle', type=int, default=1000, help='Number of generations in past at which population size reduced')
 args = parser.parse_args()
 
 input_file = args.input_file
 past_Ne = args.past_Ne
-output_dir = args.output_dir
+output = args.output
 time_bottle = args.time_bottle
 
 # Get the directory and base filename from the input file path
 file_dir = os.path.dirname(input_file)
 base_filename = os.path.splitext(os.path.basename(input_file))[0]
-
-# Ensure output directory exists
-os.makedirs(output_dir, exist_ok=True)
 
 # Load tree sequence
 slim_ts = tskit.load(input_file)
@@ -76,9 +73,7 @@ new_ts = msprime.sim_mutations(new_ts,
                        keep=True,
                        random_seed=7)
 
-# Specify the file path where you want to save the trees
-output_file = os.path.join(output_dir, f"{base_filename}_recapitated_N{past_Ne}_t{time_bottle}.trees")
 
 # Write out the trees to the specified file
-new_ts.dump(output_file)
+new_ts.dump(output)
 

@@ -17,18 +17,18 @@ parser.add_argument('input_file', help='File to be processed')
 parser.add_argument('--num_samples', type=int, default=100, help='Number of individuals to sample')
 parser.add_argument('--output', type=str, help='Output path')
 parser.add_argument('--niter', type=int, default=1000, help='Number of iterations for sampling')
+parser.add_argument('--bins', type=int, default=50, help='Number of bins')
 args = parser.parse_args()
 
 input_file = args.input_file
 num_to_sample = args.num_samples
 output = args.output
 niter = args.niter
-
+n_bins = args.bins
 
 # Create output directory for SFS files
 output_dir = os.path.join(input_file, 'sfs', str(num_to_sample))
 
-num_bins = 50  # number of bins for bincount
 
 # Construct the file paths
 # Get the directory and base filename from the input file path
@@ -80,14 +80,14 @@ sd_range = sd_range_disp * np.sqrt(0.06)
 sfs_data = {}
 
 # Create an array 's' containing 25 equally spaced values in log space
-s = np.linspace(np.log10(1), np.log10(1000), num=25)
+s = np.linspace(np.log10(1), np.log10(num_to_sample*2), num=n_bins)
 
 # Compute 'bin_edges' and add a zero at the beginning
 bin_edges = np.concatenate(([0], np.power(10, s)))
 
 # Calculate 'integer_bin_edges' and 'bin_widths'
 integer_bin_edges = np.floor(bin_edges).astype(int)
-bin_widths = np.where(np.diff(integer_bin_edges) == 0, 1, np.diff(integer_bin_edges))
+bin_widths = np.where(np.diff(integer_bin_edges) == 0, np.nan, np.diff(integer_bin_edges))
 
 # Add a zero at the beginning of array 's'
 s = np.concatenate(([0], s))
@@ -100,22 +100,20 @@ for sd_value in sd_range:
     if var_value == 0:
         weights = np.ones(len(locs[:, 0])) / len(locs[:, 0])  # Uniform weights for random sample
     else:
-        weights = get_weights(locs, 25, var_value)
+        weights = get_weights(locs, n_bins, var_value)
 
     for i in range(niter):
         samples = np.random.choice(samps_at_end, size=num_to_sample, replace=True, p=weights)
         samples = list(samples.astype(int))
-        freqs = np.sum(G[:, samples], 1)  # get frquencies by summing over individuals
-        mut_afs, edg = np.histogram(freqs, bins=bin_edges)
+        counts = np.sum(G[:, samples], 1)  # get counts by summing over individuals
+        mut_afs, edg = np.histogram(counts, bins=bin_edges)
         mut_afs = mut_afs / bin_widths  # normalise by bin width
         if i==0:
             mut_arr = mut_afs
         else:
             mut_arr = np.vstack((mut_arr,mut_afs))
     sfs_data[sd_value] = np.mean(mut_arr,axis=0)
-    print(f"SFS for width {sd_value}: {sfs_data[sd_value]}, shape {np.shape(sfs_data[sd_value])}")
-
-print(f"Computed sfs for {input_file}")
+    print(f"SFS for width {sd_value} computed")
 
 # Calculate SFS for each sample
 

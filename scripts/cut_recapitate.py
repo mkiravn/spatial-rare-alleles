@@ -65,9 +65,9 @@ demography.add_population_parameters_change(time = time_bottle * gen_time, # in 
                                             population="pop_1")
 
 # recapitate tree sequence
-new_ts = msprime.sim_ancestry(initial_state = new_ts,  # currently this works only with slim_ts but it should be dec_ts
+new_ts = msprime.sim_ancestry(initial_state = new_ts,
                             recombination_rate = 1e-8 / gen_time,
-                              demography=demography) # populations halves in size
+                              demography=demography) # population halves in size
 
 # mutate
 new_ts = msprime.sim_mutations(new_ts,
