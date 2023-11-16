@@ -83,7 +83,7 @@ sfs_data = {}
 s = np.linspace(np.log10(1), np.log10(num_to_sample*2), num=n_bins)
 
 # Compute 'bin_edges' and add a zero at the beginning
-bin_edges = np.concatenate(([0], np.power(10, s)))
+bin_edges = np.concatenate(([0.1], np.power(10, s)))
 
 # Calculate 'integer_bin_edges' and 'bin_widths'
 integer_bin_edges = np.floor(bin_edges).astype(int)
@@ -100,7 +100,7 @@ for sd_value in sd_range:
     if var_value == 0:
         weights = np.ones(len(locs[:, 0])) / len(locs[:, 0])  # Uniform weights for random sample
     else:
-        weights = get_weights(locs, n_bins, var_value)
+        weights = get_weights(locs, 25, var_value)
 
     for i in range(niter):
         samples = np.random.choice(samps_at_end, size=num_to_sample, replace=True, p=weights)
