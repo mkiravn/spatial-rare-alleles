@@ -87,13 +87,13 @@ bin_edges = np.concatenate(([0.1], np.power(10, s)))
 
 # Calculate 'integer_bin_edges' and 'bin_widths'
 integer_bin_edges = np.floor(bin_edges).astype(int)
-bin_widths = np.where(np.diff(integer_bin_edges) == 0, 1, np.diff(integer_bin_edges))
+bin_widths = np.where(np.diff(integer_bin_edges) == 0, 0, np.diff(integer_bin_edges))
 
 # Add a zero at the beginning of array 's'
 s = np.concatenate(([0], s))
 
 # Calculate 'bin_centers'
-bin_centers = np.power(10, (s[:-1] + s[1:]) / 2)[2:]
+bin_centers = np.power(10, (s[:-1] + s[1:]) / 2)
 
 for sd_value in sd_range:
     var_value = sd_value ** 2
@@ -108,6 +108,7 @@ for sd_value in sd_range:
         counts = np.sum(G[:, samples], 1)  # get counts by summing over individuals
         mut_afs, edg = np.histogram(counts, bins=bin_edges)
         mut_afs = mut_afs / bin_widths  # normalise by bin width
+        mut_afs[np.isinf(mut_afs)] = np.nan  # changed
         if i==0:
             mut_arr = mut_afs
         else:
