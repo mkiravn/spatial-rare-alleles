@@ -1,6 +1,6 @@
 import sys
 # sys.path.insert(0, '/home/mianniravn/.local/lib/python3.7/site-packages')
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 import pyslim as ps
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
@@ -87,7 +87,7 @@ bin_edges = np.concatenate(([0.1], np.power(10, s)))
 
 # Calculate 'integer_bin_edges' and 'bin_widths'
 integer_bin_edges = np.floor(bin_edges).astype(int)
-bin_widths = np.where(np.diff(integer_bin_edges) == 0, 0, np.diff(integer_bin_edges))
+bin_widths = np.where(np.diff(integer_bin_edges) == 0, 1, np.diff(integer_bin_edges))
 
 # Add a zero at the beginning of array 's'
 s = np.concatenate(([0], s))
@@ -114,7 +114,7 @@ for sd_value in sd_range:
         else:
             mut_arr = np.vstack((mut_arr,mut_afs))
     sfs_data[sd_value] = np.mean(mut_arr,axis=0)
-    print(f"SFS for width {sd_value} computed")
+    print(f"SFS for width {sd_value} computed, peek {mut_afs[:10]}.")
 
 # Calculate SFS for each sample
 

@@ -1,6 +1,6 @@
 import sys
 # sys.path.insert(0, '/home/mianniravn/.local/lib/python3.7/site-packages')
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 import pyslim as ps
 import numpy as np
 from scipy.stats import multivariate_normal as mvn
